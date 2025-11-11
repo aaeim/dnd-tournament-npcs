@@ -1,27 +1,74 @@
 const std = @import("std");
 const dnd_tournament_npcs = @import("dnd_tournament_npcs");
+const NPC = @import("my_types.zig").NPC;
+const ops = @import("operations.zig");
+
+const print = std.debug.print;
 
 pub fn main() !void {
-    // Prints to stderr, ignoring potential errors.
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
-    try dnd_tournament_npcs.bufferedPrint();
-}
+    var npcs = [32]NPC{
+        .{ .id = 0, .name = "Frodo", .hp = 100, .party_id = 0, .zone_id = 3 },
+        .{ .id = 1, .name = "Sam", .hp = 100, .party_id = 0, .zone_id = 3 },
+        .{ .id = 2, .name = "Legolas", .hp = 100, .party_id = 0, .zone_id = 3 },
+        .{ .id = 3, .name = "Aragorn", .hp = 100, .party_id = 0, .zone_id = 3 },
+        .{ .id = 4, .name = "Gimli", .hp = 100, .party_id = 0, .zone_id = 3 },
 
-test "simple test" {
-    const gpa = std.testing.allocator;
-    var list: std.ArrayList(i32) = .empty;
-    defer list.deinit(gpa); // Try commenting this out and see if zig detects the memory leak!
-    try list.append(gpa, 42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
-}
+        .{ .id = 5, .name = "Harry", .hp = 100, .party_id = 1, .zone_id = 2 },
+        .{ .id = 6, .name = "Ron", .hp = 100, .party_id = 1, .zone_id = 2 },
+        .{ .id = 7, .name = "Hermione", .hp = 100, .party_id = 1, .zone_id = 2 },
+        .{ .id = 8, .name = "Hagrid", .hp = 100, .party_id = 1, .zone_id = 2 },
+        .{ .id = 9, .name = "Griffin", .hp = 100, .party_id = 1, .zone_id = 2 },
 
-test "fuzz example" {
-    const Context = struct {
-        fn testOne(context: @This(), input: []const u8) anyerror!void {
-            _ = context;
-            // Try passing `--fuzz` to `zig build test` and see if it manages to fail this test case!
-            try std.testing.expect(!std.mem.eql(u8, "canyoufindme", input));
-        }
+        .{ .id = 10, .name = "Khaleesi", .hp = 100, .party_id = 2, .zone_id = 4 },
+        .{ .id = 11, .name = "Dragon", .hp = 100, .party_id = 2, .zone_id = 4 },
+        .{ .id = 12, .name = "Jon", .hp = 100, .party_id = 2, .zone_id = 4 },
+        .{ .id = 13, .name = "Aria", .hp = 100, .party_id = 2, .zone_id = 4 },
+
+        .{ .id = 14, .name = "Geralt", .hp = 100, .party_id = 3, .zone_id = 2 },
+        .{ .id = 15, .name = "Jennefer", .hp = 100, .party_id = 3, .zone_id = 2 },
+        .{ .id = 16, .name = "Jaskier", .hp = 100, .party_id = 3, .zone_id = 2 },
+        .{ .id = 17, .name = "Ciri", .hp = 100, .party_id = 3, .zone_id = 2 },
+
+        .{ .id = 18, .name = "Link", .hp = 100, .party_id = 4, .zone_id = 3 },
+        .{ .id = 19, .name = "Zelda", .hp = 100, .party_id = 4, .zone_id = 3 },
+        .{ .id = 20, .name = "Mario", .hp = 100, .party_id = 4, .zone_id = 3 },
+        .{ .id = 21, .name = "Luigi", .hp = 100, .party_id = 4, .zone_id = 3 },
+
+        .{ .id = 22, .name = "Shadowheart", .hp = 100, .party_id = 5, .zone_id = 1 },
+        .{ .id = 23, .name = "Karlach", .hp = 100, .party_id = 5, .zone_id = 1 },
+        .{ .id = 24, .name = "Laezel", .hp = 100, .party_id = 5, .zone_id = 1 },
+        .{ .id = 25, .name = "Astarion", .hp = 100, .party_id = 5, .zone_id = 1 },
+        .{ .id = 26, .name = "Gale", .hp = 100, .party_id = 5, .zone_id = 1 },
+
+        .{ .id = 27, .name = "Groot", .hp = 100, .party_id = 6, .zone_id = 1 },
+        .{ .id = 28, .name = "Rocket", .hp = 100, .party_id = 6, .zone_id = 1 },
+        .{ .id = 29, .name = "Peter", .hp = 100, .party_id = 6, .zone_id = 1 },
+        .{ .id = 30, .name = "Drax", .hp = 100, .party_id = 6, .zone_id = 1 },
+        .{ .id = 31, .name = "Gamorra", .hp = 100, .party_id = 6, .zone_id = 1 },
     };
-    try std.testing.fuzz(Context{}, Context.testOne, .{});
+
+    var seed: u64 = undefined;
+    try std.posix.getrandom(std.mem.asBytes(&seed));
+    var prng = std.Random.DefaultPrng.init(seed);
+    const dice = prng.random();
+
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    const allocator = gpa.allocator();
+
+    var zones: [4]std.ArrayList(*NPC) = undefined;
+
+    for (&zones) |*z| {
+        z.* = try std.ArrayList(*NPC).initCapacity(allocator, 4);
+    }
+
+    defer for (&zones) |*z| {
+        z.deinit(allocator);
+    };
+
+    try ops.updateZones(npcs[0..], zones[0..], allocator);
+    const test_zones = [4]u8{ 1, 2, 3, 4 };
+    try ops.printZones(test_zones[0..], zones[0..]);
+
+    try ops.rollAndUpdate(npcs[0..], zones[0..], allocator, dice);
+    try ops.printZones(test_zones[0..], zones[0..]);
 }
