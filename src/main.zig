@@ -2,7 +2,6 @@ const std = @import("std");
 const dnd_tournament_npcs = @import("dnd_tournament_npcs");
 const NPC = @import("my_types.zig").NPC;
 const ops = @import("operations.zig");
-
 const print = std.debug.print;
 
 pub fn main() !void {
@@ -72,4 +71,32 @@ pub fn main() !void {
     const active_zones = [4]u8{ 1, 0, 0, 0 };
     try ops.rollAndUpdate(active_zones, npcs[0..], zones[0..], allocator, dice);
     try ops.printZones(test_zones[0..], zones[0..]);
+
+    var buff: [10]u8 = undefined;
+    var in_wrapper = std.fs.File.stdin().reader(&buff);
+    const in: *std.Io.Reader = &in_wrapper.interface;
+
+    var quit: bool = false;
+
+    print("> ", .{});
+    while (in.takeDelimiterExclusive('\n')) |str| {
+        var it = std.mem.tokenizeAny(u8, str, " \t");
+        if (it.next()) |token| {
+            if (std.mem.eql(u8, token, "r")) {
+                if (it.next()) |val| {
+                    print("banana {s} \n", .{val});
+                } else {
+                    print("r needs a value! try 1111\n", .{});
+                }
+            } else if (std.mem.eql(u8, token, "q")) {
+                quit = true;
+            }
+        } else break;
+        if (quit) break;
+        print("> ", .{});
+    } else |err| switch (err) {
+        error.EndOfStream => print("EOS", .{}),
+        error.StreamTooLong => return err,
+        error.ReadFailed => return err,
+    }
 }
