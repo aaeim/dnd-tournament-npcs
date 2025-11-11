@@ -69,6 +69,7 @@ pub fn main() !void {
     const test_zones = [4]u8{ 1, 2, 3, 4 };
     try ops.printZones(test_zones[0..], zones[0..]);
 
-    try ops.rollAndUpdate(npcs[0..], zones[0..], allocator, dice);
+    const active_zones = [4]u8{ 1, 0, 0, 0 };
+    try ops.rollAndUpdate(active_zones, npcs[0..], zones[0..], allocator, dice);
     try ops.printZones(test_zones[0..], zones[0..]);
 }

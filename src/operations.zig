@@ -74,7 +74,7 @@ fn getEnemySum(id: u8, units: []u8) u8 {
     return sum;
 }
 
-pub fn rollAndUpdate(npcs: []NPC, zones: []std.ArrayList(*NPC), allocator: std.mem.Allocator, dice: std.Random) !void {
+pub fn rollAndUpdate(active_zones: [4]u8, npcs: []NPC, zones: []std.ArrayList(*NPC), allocator: std.mem.Allocator, dice: std.Random) !void {
     var z1_units: [7]u8 = .{0} ** 7;
     var z2_units: [7]u8 = .{0} ** 7;
     var z3_units: [7]u8 = .{0} ** 7;
@@ -91,6 +91,8 @@ pub fn rollAndUpdate(npcs: []NPC, zones: []std.ArrayList(*NPC), allocator: std.m
     }
 
     for (npcs) |*npc| {
+        if (active_zones[npc.zone_id - 1] == 0) continue;
+
         var enemies: u8 = 0;
         switch (npc.zone_id) {
             1 => enemies = getEnemySum(npc.party_id, z1_units[0..]),
@@ -99,15 +101,15 @@ pub fn rollAndUpdate(npcs: []NPC, zones: []std.ArrayList(*NPC), allocator: std.m
             4 => enemies = getEnemySum(npc.party_id, z4_units[0..]),
             else => {},
         }
-        const roll: u8 = dice.intRangeLessThan(u8, 1, 21);
 
+        const roll: u8 = dice.intRangeLessThan(u8, 1, 21);
         switch (roll) {
-            1...2 => {
+            1 => {
                 const nz = getNewZone(npc.zone_id);
                 try changeZone(npc, nz, zones[0..], allocator);
                 npc.hp -|= enemies * 5;
             },
-            3...9 => {
+            2...9 => {
                 npc.hp -|= enemies * 5;
             },
             10...19 => {
