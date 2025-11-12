@@ -78,8 +78,9 @@ pub fn main() !void {
 
     var quit: bool = false;
 
-    print("> ", .{});
-    while (in.takeDelimiterExclusive('\n')) |str| {
+    print("Let the tournament begin!\n> ", .{});
+    while (!quit) {
+        const str = try in.peekDelimiterExclusive('\n');
         var it = std.mem.tokenizeAny(u8, str, " \t");
         if (it.next()) |token| {
             if (std.mem.eql(u8, token, "r")) {
@@ -91,12 +92,9 @@ pub fn main() !void {
             } else if (std.mem.eql(u8, token, "q")) {
                 quit = true;
             }
-        } else break;
+        }
         if (quit) break;
         print("> ", .{});
-    } else |err| switch (err) {
-        error.EndOfStream => print("EOS", .{}),
-        error.StreamTooLong => return err,
-        error.ReadFailed => return err,
+        in.toss(str.len + 1);
     }
 }
