@@ -119,3 +119,11 @@ pub fn rollAndUpdate(active_zones: [4]u8, npcs: []NPC, zones: []std.ArrayList(*N
         }
     }
 }
+
+pub fn parseZones(z_str: []const u8) ![4]u8 {
+    var zones: [4]u8 = undefined;
+    for (z_str, 0..) |c, i| {
+        zones[i] = @as(u8, c);
+    }
+    return zones;
+}

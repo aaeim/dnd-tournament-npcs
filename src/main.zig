@@ -68,10 +68,6 @@ pub fn main() !void {
     const test_zones = [4]u8{ 1, 2, 3, 4 };
     try ops.printZones(test_zones[0..], zones[0..]);
 
-    const active_zones = [4]u8{ 1, 0, 0, 0 };
-    try ops.rollAndUpdate(active_zones, npcs[0..], zones[0..], allocator, dice);
-    try ops.printZones(test_zones[0..], zones[0..]);
-
     var buff: [10]u8 = undefined;
     var in_wrapper = std.fs.File.stdin().reader(&buff);
     const in: *std.Io.Reader = &in_wrapper.interface;
@@ -85,7 +81,13 @@ pub fn main() !void {
         if (it.next()) |token| {
             if (std.mem.eql(u8, token, "r")) {
                 if (it.next()) |val| {
-                    print("banana {s} \n", .{val});
+                    if (val.len == 4) {
+                        const zs = try ops.parseZones(val);
+                        try ops.rollAndUpdate(zs, npcs[0..], zones[0..], allocator, dice);
+                        try ops.printZones(test_zones[0..], zones[0..]);
+                    } else {
+                        print("Needs 4 zones! {s} \n", .{val});
+                    }
                 } else {
                     print("r needs a value! try 1111\n", .{});
                 }
