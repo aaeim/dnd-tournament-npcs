@@ -81,6 +81,7 @@ pub fn rollAndUpdate(active_zones: [4]u8, npcs: []NPC, zones: []std.ArrayList(*N
     var z4_units: [7]u8 = .{0} ** 7;
 
     for (npcs) |npc| {
+        if (npc.hp == 0) continue;
         switch (npc.zone_id) {
             1 => z1_units[npc.party_id] += 1,
             2 => z2_units[npc.party_id] += 1,
@@ -92,6 +93,7 @@ pub fn rollAndUpdate(active_zones: [4]u8, npcs: []NPC, zones: []std.ArrayList(*N
 
     for (npcs) |*npc| {
         if (active_zones[npc.zone_id - 1] == 0) continue;
+        if (npc.hp == 0) continue;
 
         var enemies: u8 = 0;
         switch (npc.zone_id) {
@@ -107,13 +109,13 @@ pub fn rollAndUpdate(active_zones: [4]u8, npcs: []NPC, zones: []std.ArrayList(*N
             1 => {
                 const nz = getNewZone(npc.zone_id);
                 try changeZone(npc, nz, zones[0..], allocator);
-                npc.hp -|= enemies * 5;
+                npc.hp -|= enemies * 3;
             },
             2...9 => {
-                npc.hp -|= enemies * 5;
+                npc.hp -|= enemies * 3;
             },
             10...19 => {
-                npc.hp -|= enemies * 3;
+                npc.hp -|= enemies * 2;
             },
             else => {},
         }
@@ -122,8 +124,15 @@ pub fn rollAndUpdate(active_zones: [4]u8, npcs: []NPC, zones: []std.ArrayList(*N
 
 pub fn parseZones(z_str: []const u8) ![4]u8 {
     var zones: [4]u8 = undefined;
-    for (z_str, 0..) |c, i| {
-        zones[i] = @as(u8, c);
+    for (0..4) |i| {
+        zones[i] = try std.fmt.parseInt(u8, z_str[i .. i + 1], 10);
     }
     return zones;
+}
+
+pub fn getNPC(id: u8, npcs: []NPC) ?*NPC {
+    for (npcs) |*npc| {
+        if (npc.id == id) return npc;
+    }
+    return null;
 }

@@ -73,6 +73,7 @@ pub fn main() !void {
     const in: *std.Io.Reader = &in_wrapper.interface;
 
     var quit: bool = false;
+    var rounds: u8 = 1;
 
     print("Let the tournament begin!\n> ", .{});
     while (!quit) {
@@ -84,12 +85,28 @@ pub fn main() !void {
                     if (val.len == 4) {
                         const zs = try ops.parseZones(val);
                         try ops.rollAndUpdate(zs, npcs[0..], zones[0..], allocator, dice);
+                        print("======== Round {} ========\n", .{rounds});
                         try ops.printZones(test_zones[0..], zones[0..]);
+                        rounds += 1;
                     } else {
                         print("Needs 4 zones! {s} \n", .{val});
                     }
                 } else {
                     print("r needs a value! try 1111\n", .{});
+                }
+            } else if (std.mem.eql(u8, token, "e")) {
+                if (it.next()) |id_str| {
+                    if (it.next()) |hp_str| {
+                        const id = try std.fmt.parseUnsigned(u8, id_str, 10);
+                        const hp = try std.fmt.parseUnsigned(u16, hp_str, 10);
+                        const npc = ops.getNPC(id, npcs[0..]);
+                        if (npc) |unw| unw.hp = hp;
+                        try ops.printZones(test_zones[0..], zones[0..]);
+                    } else {
+                        print("missing hp value!\n", .{});
+                    }
+                } else {
+                    print("e needs a character id!\n", .{});
                 }
             } else if (std.mem.eql(u8, token, "q")) {
                 quit = true;

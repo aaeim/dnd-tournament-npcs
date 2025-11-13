@@ -8,6 +8,6 @@ pub const NPC = struct {
     zone_id: u8,
 
     pub fn status(self: NPC, buf: []u8) ![]u8 {
-        return try std.fmt.bufPrint(buf, "{s}: {}", .{ self.name, self.hp });
+        return try std.fmt.bufPrint(buf, "{}-{s}: {}", .{ self.id, self.name, self.hp });
     }
 };
