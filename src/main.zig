@@ -108,6 +108,22 @@ pub fn main() !void {
                 } else {
                     print("e needs a character id!\n", .{});
                 }
+            } else if (std.mem.eql(u8, token, "m")) {
+                if (it.next()) |id_str| {
+                    if (it.next()) |z_str| {
+                        const id = try std.fmt.parseUnsigned(u8, id_str, 10);
+                        const z = try std.fmt.parseUnsigned(u8, z_str, 10);
+                        const npc = ops.getNPC(id, npcs[0..]);
+                        if (npc) |unw| {
+                            try ops.changeZone(unw, z, zones[0..], allocator);
+                        }
+                        try ops.printZones(test_zones[0..], zones[0..]);
+                    } else {
+                        print("missing zone id!\n", .{});
+                    }
+                } else {
+                    print("m needs a character id!\n", .{});
+                }
             } else if (std.mem.eql(u8, token, "q")) {
                 quit = true;
             }
