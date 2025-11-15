@@ -35,6 +35,7 @@ pub fn printZones(ids: []const u8, zones: []std.ArrayList(*NPC)) !void {
     for (ids) |id| {
         const idx: u8 = id - 1;
         if (idx >= zones.len) continue;
+        if (zones[idx].items.len == 0) continue;
         try printZone(id, &zones[idx]);
     }
     print("\n===============================\n", .{});
@@ -135,4 +136,20 @@ pub fn getNPC(id: u8, npcs: []NPC) ?*NPC {
         if (npc.id == id) return npc;
     }
     return null;
+}
+
+pub fn mergeZones(active_zones: [4]u8, zones: []std.ArrayList(*NPC), allocator: std.mem.Allocator) !void {
+    var host: u8 = 99;
+    var id: u8 = 0;
+    for (0..4) |i| {
+        id += 1;
+        if (active_zones[i] == 0) continue;
+        if (host == 99) {
+            host = id;
+            continue;
+        }
+        for (zones[i].items) |npc| {
+            try changeZone(npc, host, zones[0..], allocator);
+        }
+    }
 }

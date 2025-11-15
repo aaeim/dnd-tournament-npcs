@@ -124,6 +124,19 @@ pub fn main() !void {
                 } else {
                     print("m needs a character id!\n", .{});
                 }
+            } else if (std.mem.eql(u8, token, "g")) {
+                if (it.next()) |val| {
+                    if (val.len == 4) {
+                        const zs = try ops.parseZones(val);
+                        try ops.mergeZones(zs, zones[0..], allocator);
+                        try ops.printZones(test_zones[0..], zones[0..]);
+                        rounds += 1;
+                    } else {
+                        print("Needs 4 zones! {s} \n", .{val});
+                    }
+                } else {
+                    print("g needs a value! try 1100\n", .{});
+                }
             } else if (std.mem.eql(u8, token, "q")) {
                 quit = true;
             }
