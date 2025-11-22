@@ -72,7 +72,7 @@ fn getEnemySum(id: u8, units: []u8) u8 {
         if (i == id) continue;
         sum += units[i];
     }
-    return sum;
+    return std.math.clamp(sum, 0, 7);
 }
 
 pub fn rollAndUpdate(active_zones: [4]u8, npcs: []NPC, zones: []std.ArrayList(*NPC), allocator: std.mem.Allocator, dice: std.Random) !void {
@@ -110,13 +110,13 @@ pub fn rollAndUpdate(active_zones: [4]u8, npcs: []NPC, zones: []std.ArrayList(*N
             1 => {
                 const nz = getNewZone(npc.zone_id);
                 try changeZone(npc, nz, zones[0..], allocator);
-                npc.hp -|= enemies * 3;
+                npc.hp -|= getDamage(enemies, npc.max_hp, 0.04);
             },
             2...9 => {
-                npc.hp -|= enemies * 3;
+                npc.hp -|= getDamage(enemies, npc.max_hp, 0.04);
             },
             10...19 => {
-                npc.hp -|= enemies * 2;
+                npc.hp -|= getDamage(enemies, npc.max_hp, 0.03);
             },
             else => {},
         }
@@ -152,4 +152,10 @@ pub fn mergeZones(active_zones: [4]u8, zones: []std.ArrayList(*NPC), allocator: 
             try changeZone(npc, host, zones[0..], allocator);
         }
     }
+}
+
+pub fn getDamage(enemies: u8, max_hp: u16, factor: f32) u16 {
+    const f_en: f32 = @floatFromInt(enemies);
+    const f_hp: f32 = @floatFromInt(max_hp);
+    return @intFromFloat(std.math.round(f_en * factor * f_hp));
 }

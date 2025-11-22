@@ -5,45 +5,44 @@ const ops = @import("operations.zig");
 const print = std.debug.print;
 
 pub fn main() !void {
-    var npcs = [32]NPC{
-        .{ .id = 0, .name = "Frodo", .hp = 100, .party_id = 0, .zone_id = 3 },
-        .{ .id = 1, .name = "Sam", .hp = 100, .party_id = 0, .zone_id = 3 },
-        .{ .id = 2, .name = "Legolas", .hp = 100, .party_id = 0, .zone_id = 3 },
-        .{ .id = 3, .name = "Aragorn", .hp = 100, .party_id = 0, .zone_id = 3 },
-        .{ .id = 4, .name = "Gimli", .hp = 100, .party_id = 0, .zone_id = 3 },
+    var npcs = [31]NPC{
+        .{ .id = 0, .name = "Frodo", .max_hp = 36, .hp = 36, .party_id = 0, .zone_id = 3 },
+        .{ .id = 1, .name = "Sam", .max_hp = 52, .hp = 52, .party_id = 0, .zone_id = 3 },
+        .{ .id = 2, .name = "Legolas", .max_hp = 39, .hp = 39, .party_id = 0, .zone_id = 3 },
+        .{ .id = 3, .name = "Aragorn", .max_hp = 65, .hp = 65, .party_id = 0, .zone_id = 3 },
+        .{ .id = 4, .name = "Gimli", .max_hp = 60, .hp = 60, .party_id = 0, .zone_id = 3 },
 
-        .{ .id = 5, .name = "Harry", .hp = 100, .party_id = 1, .zone_id = 2 },
-        .{ .id = 6, .name = "Ron", .hp = 100, .party_id = 1, .zone_id = 2 },
-        .{ .id = 7, .name = "Hermione", .hp = 100, .party_id = 1, .zone_id = 2 },
-        .{ .id = 8, .name = "Hagrid", .hp = 100, .party_id = 1, .zone_id = 2 },
-        .{ .id = 9, .name = "Griffin", .hp = 100, .party_id = 1, .zone_id = 2 },
+        .{ .id = 5, .name = "Harry", .max_hp = 81, .hp = 81, .party_id = 1, .zone_id = 2 },
+        .{ .id = 6, .name = "Ron", .max_hp = 49, .hp = 49, .party_id = 1, .zone_id = 2 },
+        .{ .id = 7, .name = "Hermione", .max_hp = 75, .hp = 75, .party_id = 1, .zone_id = 2 },
+        .{ .id = 8, .name = "Hagrid", .max_hp = 52, .hp = 52, .party_id = 1, .zone_id = 2 },
 
-        .{ .id = 10, .name = "Khaleesi", .hp = 100, .party_id = 2, .zone_id = 4 },
-        .{ .id = 11, .name = "Dragon", .hp = 100, .party_id = 2, .zone_id = 4 },
-        .{ .id = 12, .name = "Jon", .hp = 100, .party_id = 2, .zone_id = 4 },
-        .{ .id = 13, .name = "Aria", .hp = 100, .party_id = 2, .zone_id = 4 },
+        .{ .id = 9, .name = "Khaleesi", .max_hp = 44, .hp = 44, .party_id = 2, .zone_id = 4 },
+        .{ .id = 10, .name = "Drogon", .max_hp = 110, .hp = 110, .party_id = 2, .zone_id = 4 },
+        .{ .id = 11, .name = "Jon", .max_hp = 65, .hp = 65, .party_id = 2, .zone_id = 4 },
+        .{ .id = 12, .name = "Aria", .max_hp = 55, .hp = 55, .party_id = 2, .zone_id = 4 },
 
-        .{ .id = 14, .name = "Geralt", .hp = 100, .party_id = 3, .zone_id = 2 },
-        .{ .id = 15, .name = "Jennefer", .hp = 100, .party_id = 3, .zone_id = 2 },
-        .{ .id = 16, .name = "Jaskier", .hp = 100, .party_id = 3, .zone_id = 2 },
-        .{ .id = 17, .name = "Ciri", .hp = 100, .party_id = 3, .zone_id = 2 },
+        .{ .id = 13, .name = "Geralt", .max_hp = 112, .hp = 112, .party_id = 3, .zone_id = 2 },
+        .{ .id = 14, .name = "Jennefer", .max_hp = 81, .hp = 81, .party_id = 3, .zone_id = 2 },
+        .{ .id = 15, .name = "Jaskier", .max_hp = 27, .hp = 27, .party_id = 3, .zone_id = 2 },
+        .{ .id = 16, .name = "Ciri", .max_hp = 88, .hp = 88, .party_id = 3, .zone_id = 2 },
 
-        .{ .id = 18, .name = "Link", .hp = 100, .party_id = 4, .zone_id = 3 },
-        .{ .id = 19, .name = "Zelda", .hp = 100, .party_id = 4, .zone_id = 3 },
-        .{ .id = 20, .name = "Mario", .hp = 100, .party_id = 4, .zone_id = 3 },
-        .{ .id = 21, .name = "Luigi", .hp = 100, .party_id = 4, .zone_id = 3 },
+        .{ .id = 17, .name = "Link", .max_hp = 112, .hp = 112, .party_id = 4, .zone_id = 3 },
+        .{ .id = 18, .name = "Zelda", .max_hp = 49, .hp = 49, .party_id = 4, .zone_id = 3 },
+        .{ .id = 19, .name = "Mario", .max_hp = 52, .hp = 52, .party_id = 4, .zone_id = 3 },
+        .{ .id = 20, .name = "Luigi", .max_hp = 52, .hp = 52, .party_id = 4, .zone_id = 3 },
 
-        .{ .id = 22, .name = "Shadowheart", .hp = 100, .party_id = 5, .zone_id = 1 },
-        .{ .id = 23, .name = "Karlach", .hp = 100, .party_id = 5, .zone_id = 1 },
-        .{ .id = 24, .name = "Laezel", .hp = 100, .party_id = 5, .zone_id = 1 },
-        .{ .id = 25, .name = "Astarion", .hp = 100, .party_id = 5, .zone_id = 1 },
-        .{ .id = 26, .name = "Gale", .hp = 100, .party_id = 5, .zone_id = 1 },
+        .{ .id = 21, .name = "Shadowheart", .max_hp = 44, .hp = 44, .party_id = 5, .zone_id = 1 },
+        .{ .id = 22, .name = "Karlach", .max_hp = 67, .hp = 67, .party_id = 5, .zone_id = 1 },
+        .{ .id = 23, .name = "Laezel", .max_hp = 60, .hp = 60, .party_id = 5, .zone_id = 1 },
+        .{ .id = 24, .name = "Astarion", .max_hp = 55, .hp = 55, .party_id = 5, .zone_id = 1 },
+        .{ .id = 25, .name = "Gale", .max_hp = 49, .hp = 49, .party_id = 5, .zone_id = 1 },
 
-        .{ .id = 27, .name = "Groot", .hp = 100, .party_id = 6, .zone_id = 1 },
-        .{ .id = 28, .name = "Rocket", .hp = 100, .party_id = 6, .zone_id = 1 },
-        .{ .id = 29, .name = "Peter", .hp = 100, .party_id = 6, .zone_id = 1 },
-        .{ .id = 30, .name = "Drax", .hp = 100, .party_id = 6, .zone_id = 1 },
-        .{ .id = 31, .name = "Gamorra", .hp = 100, .party_id = 6, .zone_id = 1 },
+        .{ .id = 26, .name = "Groot", .max_hp = 102, .hp = 102, .party_id = 6, .zone_id = 1 },
+        .{ .id = 27, .name = "Rocket", .max_hp = 36, .hp = 36, .party_id = 6, .zone_id = 1 },
+        .{ .id = 28, .name = "Peter", .max_hp = 39, .hp = 39, .party_id = 6, .zone_id = 1 },
+        .{ .id = 29, .name = "Drax", .max_hp = 71, .hp = 71, .party_id = 6, .zone_id = 1 },
+        .{ .id = 30, .name = "Gamorra", .max_hp = 42, .hp = 42, .party_id = 6, .zone_id = 1 },
     };
 
     var seed: u64 = undefined;
