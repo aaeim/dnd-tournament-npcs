@@ -110,10 +110,10 @@ pub fn rollAndUpdate(active_zones: [4]u8, npcs: []NPC, zones: []std.ArrayList(*N
             1 => {
                 const nz = getNewZone(npc.zone_id);
                 try changeZone(npc, nz, zones[0..], allocator);
-                npc.hp -|= getDamage(enemies, npc.max_hp, 0.04);
+                npc.hp -|= getDamage(enemies, npc.max_hp, 0.05);
             },
             2...9 => {
-                npc.hp -|= getDamage(enemies, npc.max_hp, 0.04);
+                npc.hp -|= getDamage(enemies, npc.max_hp, 0.05);
             },
             10...19 => {
                 npc.hp -|= getDamage(enemies, npc.max_hp, 0.03);
