@@ -136,6 +136,11 @@ pub fn main() !void {
                 } else {
                     print("g needs a value! try 1100\n", .{});
                 }
+            } else if (std.mem.eql(u8, token, "h")) {
+                print("r: simulate round\t use: r active_zones\t EX: r 1111\n", .{});
+                print("e: edit hp\t\t use: e npc_id hp\t EX: e 21 33\n", .{});
+                print("m: move to zone\t\t use: m npc_id zone\t EX: m 21 3\n", .{});
+                print("g: merge group\t\t use: g zones_to_merge\t EX: g 1100\n", .{});
             } else if (std.mem.eql(u8, token, "q")) {
                 quit = true;
             }
